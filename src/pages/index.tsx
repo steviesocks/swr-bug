@@ -1,19 +1,50 @@
 import Head from "next/head";
 import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Roboto_Mono } from "next/font/google";
 import styles from "@/styles/Home.module.css";
+import useSWR from "swr";
+import { useEffect } from "react";
+// import dynamic from 'next/dynamic';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// // Import the DataFetcher component with dynamic import to avoid SSR issues
+// const DataFetcher = dynamic(() => import('../components/DataFetcher'), {
+//   ssr: false,
+//   loading: () => <p>Loading SWR component...</p>
+// });
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const robotoMono = Roboto_Mono({
+  variable: "--font-roboto-mono",
   subsets: ["latin"],
 });
 
 export default function Home() {
+  useEffect(() => {
+    // Initial check of visibility state
+    console.log('VISIBILITY', document.visibilityState);
+
+    // Function to handle visibility change
+    const handleVisibilityChange = () => {
+      console.log('VISIBILITY', document.visibilityState);
+    };
+
+    // Add event listener for visibility changes
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Clean up the event listener when component unmounts
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+  useSWR('https://jsonplaceholder.typicode.com/todos/1', () => {
+    console.log('refetching...');
+    return fetch('https://jsonplaceholder.typicode.com/todos/1');
+  });
+
   return (
     <>
       <Head>
@@ -23,7 +54,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div
-        className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}
+        className={`${styles.page} ${inter.variable} ${robotoMono.variable}`}
       >
         <main className={styles.main}>
           <Image
@@ -40,6 +71,11 @@ export default function Home() {
             </li>
             <li>Save and see your changes instantly.</li>
           </ol>
+
+          {/* SWR Data Fetching Example */}
+          {/* <div className={styles.swrExample}>
+            <DataFetcher />
+          </div> */}
 
           <div className={styles.ctas}>
             <a
